@@ -1,0 +1,194 @@
+<<set-parent4, echo=FALSE, cache=FALSE>>=
+set_parent('3_16.Rnw')
+@
+
+\section{Pilot Study: The Palestinian Dissident Network}
+
+To demonstrate the feasibility of the empirical approach, and the plausibility of the theoretical arguments, I provide a case study of the Palestinian dissident network. This analysis does not fully implement all elements of the research design outlined in the preceding section. I have not created a network for every month of the conflict, instead creating snapshots for a few key junctures. I also do not include negative ties (conflictual events) in the networks presented here, instead recording a tie any time two dissident groups interact, and the mean interaction is more cooperative than conflictual.
+
+Figure \ref{ohthree} illustrates the Palestinian dissident network in September 2000, the beginning of the Second Intifada.\footnote{Only events occurring prior to the official start of the Intifada on September 28, 2000 are used to measure network ties.} There were eight groups in the dissident network in that month, most having ties to at least one other group. A closed triad (three nodes all having connections with each other) sits at the center of this network, with Fatah, Hamas, and the PLO as members. The connection between Fatah and the PLO is entirely unsurprising, given Yasser Arafat's leadership of both organization. It is also makes sense for Hamas to be connected with the PLO, given that the latter serves as the \textit{de facto} Palestinian government for many purposes. The connection between Hamas and Fatah is surprising given the state of their relations in later years, but can be attributed to Arafat's efforts to build unity among Palestinians. Islamic Jihad is tied to Fatah, the Popular Front for the Liberation of Palestine is tied to the PLO, and the Democratic Front for the Liberation of Palestine is connected to Hamas. Thus all of the non-official dissident organizations share at least one connection to another organization. Only WAFA, the official radio station of the Palestinian Authority, and the Palestinian Legislative Council,\footnote{The actors falling under this heading are Palestinian legislators who are not clearly aligned with Fatah or Hamas.} the legislature of the Palestinian Authority, are not connected to other actors. The edge density of the network at this point was 0.21, meaning that 21\% of all possible ties within the network were actualized. The modularity of the network is 0.16, meaning that there is slightly more clustering of ties than one would expect in a random network. The number of armed groups appearing in the conflict was 3 in September 2000, 4 in the two following months, and between 1 and 3 groups for the seven months after that.
+
+\begin{figure}
+\centering
+<<second_ohthree, echo=FALSE, results='asis', warning=FALSE, message=FALSE, cache=FALSE>>=
+#### Create Network ####
+library(igraph)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(lubridate)
+library(readr)
+library(ggplot2)
+theme_set(theme_bw())
+
+pal <- read_csv("~/Dropbox/Prospectus/Diss Network/pal_diss.csv")
+pal <- pal[,2:21]
+
+#### 2nd Intifada ####
+
+ohthree <- subset(pal,date < "2000-09-27" & date > "1999-03-01")
+
+#create dyadids
+nums <- data.frame(alt.src=unique(ohthree$alt.src))
+nums$num.src <- seq(1:8)
+
+ohthree <- merge(ohthree,nums)
+
+colnames(nums) <- c("alt.tgt","num.tgt")
+
+ohthree <- merge(ohthree,nums)
+#rm(nums)
+
+ohthree$dyadnum <- ifelse(ohthree$num.src < ohthree$num.tgt, paste(ohthree$num.src,ohthree$num.tgt,sep="-"), paste(ohthree$num.tgt,ohthree$num.src,sep="-"))
+
+#### Condense for network ####
+dyad <- ohthree %>%
+  group_by(dyadnum) %>%
+  summarize(gold=mean(goldstein))
+
+dyad$low <- sapply(strsplit(dyad$dyadnum, "-"), "[", 1)
+dyad$hi <- sapply(strsplit(dyad$dyadnum, "-"), "[", 2)
+
+dyad <- subset(dyad,select=-dyadnum)
+
+
+##make adjacency matrix
+
+#make empty frame
+hi <- seq(1:8)
+
+full <- data.frame(hi=character(),low=character())
+
+frame <- for(i in hi){
+  low=rep(i,length(hi))
+  frame=cbind(low,hi)
+  full=rbind(full,frame)
+}
+rm(frame,hi,i,low)
+
+#merge
+full <- merge(full,dyad,all=T)
+
+#convert to wide
+wide <- full %>% spread(hi, gold)
+rm(full)
+
+wide[,2:9][is.na(wide[,2:9])] <- 0
+wide[,2:9][wide[,2:9] < 0] <- 0 #remove conflict
+
+
+#convert to matrix
+mat <- as.matrix(wide[,2:9])
+
+colnames(mat) <- c("PLO","Fatah","Hamas","PFLP","PLC","WAFA","Islamic Jihad","DFLP")
+rownames(mat) <- c("PLO","Fatah","Hamas","PFLP","PLC","WAFA","Islamic Jihad","DFLP")
+
+#remove relationsips w/ self
+diag(mat) <- 0
+
+graph <- graph_from_adjacency_matrix(mat,mode="undirected",weighted = T)
+V(graph)$color <- "white"
+V(graph)$label.cex <- 0.7
+plot(graph,main="September 2000 \n Density = 0.21 ; Modularity = 0.17",vertex.size=32)
+@
+\caption{The Palestinian Dissident Network at the Start of the Second Intifada}
+\label{inti}
+\end{figure}
+
+The number of armed groups peaked at 7 on three occasions. The dissident network in one of these periods (October 2007) is plotted in Figure \ref{gaza}. The network has similar membership as it did in September 2001, but has one more node and one fewer tie. Thus, the density is somewhat lower, at 0.14. In addition, the ties that do exist are more clustered than before, resulting in a higher modularity score of 0.30, indicating that the two clusters have slightly more internal ties than one would expect of ties were randomly distributed in the network. This network was constructed entirely from interactions that occurred after the death of Yaser Arafat, and aligns with the popular conception that the Palestinians became more factionalized after his passing (although Fatah and Hamas themselves continued to have some amount of cooperation). These two periods are consistent with my theoretical expectations. The earlier period features a network that is comparatively dense and non-modular. Relatively few groups resorted to violence around this time. In the later period, the number of ties in the network was comparatively sparse, and modularity was high. 7 groups engaged in violence that month, and the figure was generally high for several months before and after.
+
+\begin{figure}
+\centering
+<<gaza, echo=FALSE, results='asis', warning=FALSE, message=FALSE, cache=FALSE>>=
+#### Post-Arafat ####
+post <- subset(pal, date > "2006-04-01" & date < "2007-10-01")
+
+nums.post <- data.frame(alt.src=unique(post$alt.src))
+nums.post$num.src <- seq(1:9)
+
+post <- merge(post,nums.post)
+
+colnames(nums.post) <- c("alt.tgt","num.tgt")
+
+post <- merge(post,nums.post)
+#rm(nums)
+
+post$dyadnum <- ifelse(post$num.src < post$num.tgt, paste(post$num.src,post$num.tgt,sep="-"), paste(post$num.tgt,post$num.src,sep="-"))
+
+#### Condense for network ####
+dyad.post <- post %>%
+  group_by(dyadnum) %>%
+  summarize(gold=mean(goldstein))
+
+dyad.post$low <- sapply(strsplit(dyad.post$dyadnum, "-"), "[", 1)
+dyad.post$hi <- sapply(strsplit(dyad.post$dyadnum, "-"), "[", 2)
+
+dyad.post <- subset(dyad.post,select=-dyadnum)
+
+##make adjacency matrix
+
+#make empty frame
+hi <- seq(1:9)
+
+full <- data.frame(hi=character(),low=character())
+
+frame <- for(i in hi){
+  low=rep(i,length(hi))
+  frame=cbind(low,hi)
+  full=rbind(full,frame)
+}
+rm(frame,hi,i,low)
+
+#merge
+full <- merge(full,dyad.post,all=T)
+
+#convert to wide
+wide.post <- full %>% spread(hi, gold)
+rm(full)
+
+wide.post[,2:10][is.na(wide.post[,2:10])] <- 0
+wide.post[,2:10][wide.post[,2:10] < 0] <- 0 #remove conflict
+
+#convert to matrix
+mat.post <- as.matrix(wide.post[,2:10])
+colnames(mat.post) <- c("Islamic Jihad","Fatah","al-Aqsa","Hamas","PFLP","PLC","PLO","al-Quds","DFLP")
+rownames(mat.post) <- c("Islamic Jihad","Fatah","al-Aqsa","Hamas","PFLP","PLC","PLO","al-Quds","DFLP")
+
+#remove relationsips w/ self
+diag(mat.post) <- 0
+
+graph.post <- graph_from_adjacency_matrix(mat.post,mode="undirected",weighted = T)
+V(graph.post)$color <- "white"
+V(graph.post)$label.cex <- 0.7
+plot(graph.post,main="October 2007 \n Density = 0.14 ; Modularity = 0.30",vertex.size=32)
+@
+\caption{The Palestinian Dissident Network at in October 2007}
+\label{gaza}
+\end{figure}
+
+This pattern is robust to changes in the measurement of network ties. Using shorter or longer periods results in differing network sizes, but the density and modularity remain similar. Excluding groups such as the Palestinian Legislative Council, and coding permanent ties between the political parties and their militant wings also does not change the results. Furthermore, the severity of the conflict, at least in terms of the total number of conflictual events captured by ICEWS, was not vastly different between these periods, as there were 6 total conflict events in September 2000, and 9 in October 2007 (see Figure \ref{tot}).
+
+\begin{figure}
+<<groups, echo=FALSE, results='asis', warning=FALSE, message=FALSE, cache=TRUE>>=
+library(readr)
+library(ggplot2)
+theme_set(theme_bw())
+
+pal.ym <- read_csv("pal_ym.csv")
+
+ggplot(pal.ym,aes(x=ym,y=conflict)) + geom_line() + ylab("Militant Groups") + xlab("Date") + ggtitle("Groups w/ Any Conflict w/ Israel") + scale_y_continuous(breaks=c(0:10,2))
+@
+\caption{Palestinian Dissident Groups Using Violence, 1995--2014}
+\label{groups}
+\end{figure}
+
+\begin{figure}
+\centering
+<<total, echo=FALSE, results='asis', warning=FALSE, message=FALSE, cache=FALSE>>=
+ggplot(pal.ym,aes(x=ym,y=tot.conflict)) + geom_line() + xlab("Date") + ylab("Events") + ggtitle("Total Palestinian-Israeli Conflict Events")
+@
+\caption{Total Palestinian-Israeli Conflict Events, 1995--2014}
+\label{tot}
+\end{figure}
+
+While there is no guarantee that this relationship will hold across the full set of observations, nor after the complete methodology is implemented, this pilot study is generally quite promising. It clearly demonstrates that it is possible to construct social networks from the ICEWS data that rate highly in terms of face validity, and the results are consistent with my core hypotheses. One concern raised by the study is that the size of the dissident network in terms of the number of nodes is fairly small and lacking in ties. While measures like edge density are so simple that they perform well regardless of sample size, it is less clear whether modularity measures are robust at this scale. Additionally, the Palestinian case is one of the more data-rich conflicts in the ICEWS data, raising the possibility that even if these concerns prove to be minor in this case, they may be problematic in others.

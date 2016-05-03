@@ -1,0 +1,137 @@
+<<set-parent3, echo=FALSE, cache=FALSE>>=
+set_parent('isa16.Rnw')
+@
+
+<<panel_data_creation, echo=FALSE, results='asis', warning=FALSE, message=FALSE, cache=FALSE>>=
+source("panel_data_creation.R")
+@
+
+\section{Pilot Study: External Support}
+
+I have yet to construct the external actor network needed to test the spillover effect predicted by \textit{H8a} and \textit{H8b}. I can, however, provide a preliminary and indirect test of \textit{H5}, which expects greater dissident network modularity following the provision of external support to one or more members. I also do not have a completed dissident network at this time, and instead test the second order outcome --- increases in the number of rebel groups.
+
+\subsection{Research Design}
+
+\subsubsection{Dependent Variable}
+
+\textbf{New Rebel Group Entries} In the conflict-year analyses I include all new rebel groups that enter the conflict in the dependent variable. This is so partly for pragmatic reasons, as the number of splinter organizations is quite small ($n=33$) in the period for which yearly external support data is available (1975--2010). Also, the theoretical logic above suggests that new groups considering joining the conflict should be affected by external support in a similar manner to factions within existing groups. Thus, I code a count of the total number of new groups entering the conflict in a given year. This measure is constructed from the UCDP Dyadic Conflict data \citep{Pettersson2015a}, with a group being included in the count the year of their first conflict against the government (i.e. groups that have previously been active against the government are excluded). Out of 1,355 conflict-years, there are 152 cases of one group entering the conflict, 19 cases of two groups entering, and five cases of three groups entering.
+
+\subsubsection{Explanatory Variables}
+
+\textbf{External Support Onset} For one measure of external support I include all forms of support measured by the UCDP External Support Data \citep{Themner2011}. Specific forms of support include troops, access to territory, access to military or intelligence operations, weapons, materiel and logistics, training and expertise, funding and economic support, intelligence, other, and unknown. I code a binary indicator as 1 for any year in which a pre-existing rebel group receives any form of support for the first time (groups coded as having support starting in 1975 are considered to be censored). All sources of support are included. Most support is provided by states, but in a few cases intergovernmental organizations such as NATO are the donors. I code only the first instance of support as an onset event (i.e. a group already receiving support would not be coded as experiencing support onset if it began receiving support from a new donor).
+
+\textbf{Military Support Onset} I also consider a measure consisting solely of military support, including the categories of access to territory, access to military or intelligence operations, weapons, materiel and logistics, and training and expertise.
+
+\subsubsection{Control Variables}
+
+The control variables used in this analysis are described in the project-wide research design presented in Section 6.
+
+\subsubsection{Model}
+
+As the dependent variable in this analysis is a count, I use poisson regression. As the data are in panel format, and thus susceptible to serial and spatial autocorrelation, I include fixed effects for both the conflict and year.
+
+\subsection{Results}
+
+Results for the first panel analysis are reported in Table \ref{panel1}. Model 1 employs a measure of any external support onset, measured at the current year and with one and two lags. The contemporaneous effect of support onset is statistically significant at the 99.9\% level, and has a large substantive effect. An existing rebel group receiving external suThpport for the first time increases the expected number of groups entering the conflict by slightly more than 4. The first lag of the support measure is not statistically significant, while the second lag is significant at the 90\% with a more modest effect size, increasing the expected number of entrants by 1.5. A number of control variables are not statistically significant. Models 1 and 2 include indicators for whether the country was democratic, the number of ethnic groups facing discrimination, the year of the conflict episode, and the logged population and area of the country. Of these, only population is significant, with a weak negative relationship with the number of entrants. Model 2 also includes indicators for the presence of several lootable natural resources --- gold, diamonds, oil and drugs. None of these measures approach statistical significance.
+
+<<1975-models, echo=FALSE, results='asis', warning=FALSE, message=FALSE, cache=FALSE>>=
+library(pglm)
+library(texreg)
+
+panel <- pdata.frame(cy, c("ucdpid","year"))
+
+##Models for 1975-present period
+
+#all external support, no resources
+m1 <- summary(pglm(non.prev.entries ~ ext.sup.start + lext.sup.start + l2ext.sup.start + (polity>5) + ep.year + (epr_discriminated) + log(pop) + log(area), data=panel, family="poisson", model="pooling", effect="twoways"))
+#create regular glms to serve as placeholders for texreg
+m1b <- glm(non.prev.entries ~ ext.sup.start + lext.sup.start + l2ext.sup.start + (polity>5) + ep.year + (epr_discriminated) + log(pop) + log(area), data=panel, family="poisson")
+
+#all external, resources
+m2 <- summary(pglm(non.prev.entries ~ ext.sup.start + lext.sup.start + l2ext.sup.start + (polity>5) + ep.year + (epr_discriminated) + log(pop) + log(area) + (gold>0) + (diamonds>0) + (oil>0) + (drugs>0), data=panel, family="poisson", model="pooling", effect="twoways"))
+m2b <- glm(non.prev.entries ~ ext.sup.start + lext.sup.start + l2ext.sup.start + (polity>5) + ep.year + (epr_discriminated) + log(pop) + log(area) + (gold>0) + (diamonds>0) + (oil>0) + (drugs>0), data=panel, family="poisson")
+
+#military support, no resources
+m3 <- summary(pglm(non.prev.entries ~ ext.mil.start + lext.mil.start + l2ext.mil.start + (polity>5) + ep.year + (epr_discriminated) + log(pop) + log(area), data=panel, family="poisson", model="pooling", effect="twoways"))
+m3b <- glm(non.prev.entries ~ ext.mil.start + lext.mil.start + l2ext.mil.start + (polity>5) + ep.year + (epr_discriminated) + log(pop) + log(area), data=panel, family="poisson")
+
+#military support, resources
+m4 <- summary(pglm(non.prev.entries ~ ext.mil.start + lext.mil.start + l2ext.mil.start + (polity>5) + ep.year + (epr_discriminated) + log(pop) + log(area) + (gold>0) + (diamonds>0) + (oil>0) + (drugs>0), data=panel, family="poisson", model="pooling", effect="twoways"))
+m4b <- glm(non.prev.entries ~ ext.mil.start + lext.mil.start + l2ext.mil.start + (polity>5) + ep.year + (epr_discriminated) + log(pop) + log(area) + (gold>0) + (diamonds>0) + (oil>0) + (drugs>0), data=panel, family="poisson")
+
+names2 <- c("(Intercept)","All Support","All Support, 1 lag","All Support, 2 lags","Democracy","Episode Year","Discriminated Groups","log(Population)","log(Area)","Gold","Diamonds","Oil","Drugs","Military Support","Military Support, 1 lag","Military Support, 2 lags")
+
+texreg(list(m1b,m2b,m3b,m4b), override.coef=list(coef(m1)[,1], coef(m2)[,1], coef(m3)[,1], coef(m4)[,1]), override.se=list(coef(m1)[,2], coef(m2)[,2], coef(m3)[,2], coef(m4)[,2]), override.pvalues=list(coef(m1)[,4], coef(m2)[,4], coef(m3)[,4], coef(m4)[,4]), include.aic=F, include.bic=F, include.deviance=F, caption="Fixed Effects Poisson Models of Rebel Group Entries, 1976--2010",custom.coef.names=names2,custom.model.names=c("Model 1","Model 2","Model 3","Model 4"),label="panel1")
+@
+
+Models 3 and 4 measure the effect of military support, including assistance in the form of weapons, war materiel, training, intelligence, and use of foreign territory. Military support performs in a very similar manner to the aggregate support measure, with a significant contemporaneous relationship, and the lagged measures being non-significant. The substantive effect is similar, with the onset of military support increasing the the expected number of entrants by 4.4 (see Figure \ref{m4odds} for all substantive effects from Model 4). The control variables perform in largely the same way as in Models 1 and 2. Population again has a significant, negative relationship. Episode year is significant in Models 3 and 4, but very weak substantively. No other controls, including the resource variables, are significant.
+
+\begin{figure}
+\centering
+<<effects_plot2, fig.width=5.5, fig.height=3.8, fig=TRUE, echo=F>>=
+opts_chunk$set(dev = 'pdf')
+library(ggplot2)
+
+exp <- data.frame(coef=exp(coef(m4)[,1]), se=exp(coef(m4)[,2]))
+exp$names <- c("(Intercept)","Military Support","Military Support, 1 lag","Military Support, 2 lags","Democracy","Episode Year","Discriminated Groups","log(Population)","log(Area)","Gold","Diamonds","Oil","Drugs")
+exp$ci.hi <- exp$coef + 1.96*exp$se
+exp$ci.lo <- exp$coef - 1.96*exp$se
+
+exp$names <- factor(exp$names,levels=unique(exp$names))
+
+exp <- exp[2:length(exp$coef),]
+
+ggplot(exp, aes(x=coef,y=names)) + geom_point(size=1) + geom_errorbarh(aes(xmax=ci.hi,xmin=ci.lo),height=0) + theme_bw() + geom_vline(xintercept=1,color="gray",linetype="longdash") + xlab("Exponentiated Coefficients") + ylab("")
+@
+\scriptsize \textit{Simulations based on Model 8. Lines represent 95\% confidence intervals.}
+\caption{Substantive Effects, 1976--2010}
+\label{m4odds}
+\end{figure}
+
+Models including fatality measures are reported in Table \ref{panel1}. Due to data availability, these analyses cover only the period 1989--2014. Model 5 employs the comprehensive measure of all external support, while Model includes only military support. The results are not substantially changed by the inclusion of the fatality measures. The contemporaneous effect for each of the support measures is significant, though with slightly smaller substantive effects. The lagged measures are not significant. Population continues to have a significant, negative relationship, while area has a weak positive relationship in the fatality models. As before, no other controls are significant. The measure of total fatalities resulting from government-rebel fighting in the prior year is not statistically significant in either model, nor does it alter the performance of the other variables. The measure civilians killed by rebel groups in the prior year is significant at the 90\% level in Model 5, and the 95\% level in Model 6. Contrary to \textit{H2}, the coefficients are negative in each model, though the substantive effects are weak. Complete substantive effects for these models are plotted in Figure \ref{fatalodds}.
+
+<<1989-models, echo=FALSE, results='asis', warning=FALSE, message=FALSE, cache=FALSE>>=
+fatal <- subset(cy,year>=1989)
+fatal$rebciv.fatal[is.na(fatal$rebciv.fatal)] <- 0
+fatal <- pdata.frame(fatal,c("ucdpid","year"))
+
+#all support
+f1 <- summary(pglm(non.prev.entries ~ ext.sup.start + lext.sup.start + l2ext.sup.start + (polity>5) + ep.year + (epr_discriminated) + log(pop) + log(area) + lag(log(rebciv.fatal+.1)) + lag(log(fatal)), data=fatal, family="poisson", model="pooling", effect="twoways"))
+f1b <- glm(non.prev.entries ~ ext.sup.start + lext.sup.start + l2ext.sup.start + (polity>5) + ep.year + (epr_discriminated) + log(pop) + log(area) + lag(log(rebciv.fatal+.1)) + lag(log(fatal)), data=fatal, family="poisson")
+
+#mil support
+f2 <- summary(pglm(non.prev.entries ~ ext.mil.start + lext.mil.start + l2ext.mil.start + (polity>5) + ep.year + (epr_discriminated) + log(pop) + log(area) + lag(log(rebciv.fatal+.1)) + lag(log(fatal)), data=fatal, family="poisson", model="pooling", effect="twoways"))
+f2b <- glm(non.prev.entries ~ ext.mil.start + lext.mil.start + l2ext.mil.start + (polity>5) + ep.year + (epr_discriminated) + log(pop) + log(area) + lag(log(rebciv.fatal+.1)) + lag(log(fatal)), data=fatal, family="poisson")
+
+names3 <- c("(Intercept)","All Support","All Support, 1 lag","All Support, 2 lags","Democracy","Episode Year","Discriminated Groups","log(Population)","log(Area)","log(Civilians Killed by Rebels), 1 lag","log(Government-Rebel Fatalities), 1 lag","Military Support","Military Support, 1 lag","Military Support, 2 lags")
+texreg(list(f1b,f2b), override.coef=list(coef(f1)[,1], coef(f2)[,1]), override.se=list(coef(f1)[,2], coef(f2)[,2]), override.pvalues=list(coef(f1)[,4], coef(f2)[,4]), include.aic=F, include.bic=F, include.deviance=F, caption="Fixed Effects Poisson Models of Rebel Group Entries, 1989--2010",custom.coef.names=names3,custom.model.names=c("Model 5","Model 6"),label="panel2")
+@
+
+\begin{figure}
+\centering
+<<effects_plot3, fig.width=6.5, fig.height=3.8, fig=TRUE, echo=F>>=
+opts_chunk$set(dev = 'pdf')
+
+exp2 <- data.frame(coef=exp(coef(f2)[,1]), se=exp(coef(f2)[,2]))
+exp2$names <- c("(Intercept)","Military Support","Military Support, 1 lag","Military Support, 2 lags","Democracy","Episode Year","Discriminated Groups","log(Population)","log(Area)","log(Civilians Killed by Rebels), 1 lag","log(Government-Rebel Fatalities), 1 lag")
+#exp2$names <- rownames(exp2)
+exp2$ci.hi <- exp2$coef + 1.96*exp2$se
+exp2$ci.lo <- exp2$coef - 1.96*exp2$se
+
+exp2$names <- factor(exp2$names,levels=unique(exp2$names))
+exp2 <- exp2[2:length(exp2$coef),]
+
+ggplot(exp2, aes(x=coef,y=names)) + geom_point(size=1) + geom_errorbarh(aes(xmax=ci.hi,xmin=ci.lo),height=0) + theme_bw() + geom_vline(xintercept=1,color="gray",linetype="longdash") + xlab("Exponentiated Coefficients") + ylab("")
+@
+\scriptsize \textit{Simulations based on Model 10. Lines represent 95\% confidence intervals.}
+\caption{Substantive Effects, 1989--2010}
+\label{fatalodds}
+\end{figure}
+
+\subsubsection{Discussion}
+
+I expect that the provision of external support to a member of the dissident network will ultimately lead to more rebel groups entering the conflict, as the network becomes more modular. The models in Tables \ref{panel1} and \ref{panel2} are consistent with this notion, as the entry of new rebel groups to the conflict coincides with the initiation of external support for existing rebel groups. Some caveats apply, however. I find robust support for only a contemporaneous effect, meaning that I cannot rule out the possibility that external support comes in response to an increase in the number of rebel groups, rather than the reverse.  The fact that the second lag of the support measures are generally significant at the 90\%, however, lends some support to my hypothesized temporal ordering. Alternatively, the two phenomena could be spuriously related, instead each responding to some underlying factor. For instance, both may increase as the conflict reaches a general crescendo. I have attempted to address these concerns by controlling for the year of the conflict episode. Running the analyses only on conflict years that are not the first in an episode, also produces similar results. Furthermore, I control for trends in the general intensity of the conflict. The lagged measure of total government-rebel fatalities does not alter the performance of the external support measures. Including contemporaneous fatality measures, and even reverse lags does not alter their performance either. Finally, I have included a number of other controls beyond those reported in the final analyses, including alternative measures of ethnic diversity, geographic attributes such as urbanization and mountainous terrain, economic attributes, and the same rebel group attributes that appear in the group-level analyses. The relationship between contemporaneous support and new group formation is robust to all of these. Thus, I cannot reject the null hypothesis of no relationship between external support and increases in the number of rebel groups. This is suggestive of support for the theory, though I acknowledge that the multiple interpretations of the finding are plausible.
+
+\textit{H7} attempts to establish a more precise mechanism by which external support is related to the entry of new rebel groups, hypothesizing that support allows rebels to become more violent towards civilians. This in turn might provoke strife within the group. Contrary to my expectations, the measure has a statistically significant, negative relationship with the entry of new rebel groups. This suggests that increased violence against civilians is not the mechanism relating external support to the entry of new rebel groups. However, such a relationship might be more complex than the current models allow. Further work should test civilian fatalities as a mediation effect situated between external support and rebel group entry.
+
+In summary, I find a robust temporal relationship between the onset of external support for existing rebel groups, and the entry of new rebel groups to the conflict. I do not find evidence that external support explains the cross-sectional variation in the probability of rebel group splintering, nor do I find evidence that rebel violence against civilians is the link between external support and the entry of new groups. The fact that the natural resource variables do not predict the entry of new groups in a panel framework, along with the fact that relatively non-fungible military support performs similarly to a comprehensive measure of support that includes financing, perhaps suggests that the relationship is not driven by material resources. One remaining explanation is that external support activates political conflict with the dissident network. This could be ideological conflict, as external support clarifies the recipient group's preferences. Alternatively, it could alter internal power structures in such a way that fragmentation and separate mobilization are incentivized. Another possible explanation is that external support is distributed in a way that incentivizes (or fails to disincentivize) the fragmentation of dissident movements into multiple rebel groups, while other resources are not.

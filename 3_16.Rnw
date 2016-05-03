@@ -1,0 +1,58 @@
+\documentclass[12pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage{tgpagella}
+\usepackage{microtype}
+\usepackage{parskip}
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{dcolumn}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{natbib}
+\bibliographystyle{apsr}
+\bibpunct{(}{)}{;}{a}{}{;}
+\usepackage{caption}
+\usepackage[hidelinks]{hyperref}
+
+\setlength\parindent{20pt}
+\doublespacing
+
+\begin{document}
+
+\author{David Bowden}
+\title{Politics Among Rebels: The Causes and Consequences of Division within Dissident Movements}
+\begin{singlespace}
+\maketitle
+
+
+% \begin{abstract}
+% Prior work shows that multi-party civil wars are a particularly dangerous subset of conflict. Yet, our understanding of the causes of such arrangements is limited. I argue that the initiation of external support to existing rebel groups should lead to increases in the number of rebel groups by activating ideological cleavages among dissidents. This occurs as external support clarifies the ideological position of the recipient group and disrupts existing ideological compromises. I test this theory using panel data on external support for rebel groups covering the period 1976--2010, finding that the initiation of external support to existing rebel groups is associated with a substantial increase in the total number of rebel groups participating in the conflict. I find no support for the notion that support provokes division among rebels by facilitating violence against civilians. These results suggest that political differences are an important determinant of rebel movement structure, though further work is needed to identify a precise mechanism.
+% \end{abstract}
+
+\end{singlespace}
+
+
+\input{intro.tex}
+
+\input{lit.tex}
+
+\input{framework.tex}
+
+\input{static.tex}
+
+\input{spillover.tex}
+
+\input{data.tex}
+
+\Sexpr{knit_child('palestinians.Rnw')}
+
+\Sexpr{knit_child('panel_results.Rnw')}
+
+\begin{singlespace}
+	\bibliography{/Users/david/Dropbox/library.bib}
+\end{singlespace}
+
+\end{document}
