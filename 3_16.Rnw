@@ -1,3 +1,5 @@
+% !TEX root = 3_16.Rnw
+
 \documentclass[12pt]{article}
 
 \usepackage[T1]{fontenc}
@@ -49,7 +51,13 @@
 
 \Sexpr{knit_child('palestinians.Rnw')}
 
+% <<child_pal, child='palestinians.Rnw'>>=
+% @
+
 \Sexpr{knit_child('panel_results.Rnw')}
+
+% <<child_panel, child='panel_results.Rnw'>>=
+% @
 
 \begin{singlespace}
 	\bibliography{/Users/david/Dropbox/library.bib}

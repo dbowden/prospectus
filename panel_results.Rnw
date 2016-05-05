@@ -1,3 +1,5 @@
+% !TEX root = 3_16.Rnw
+
 <<set-parent3, echo=FALSE, cache=FALSE>>=
 set_parent('isa16.Rnw')
 @

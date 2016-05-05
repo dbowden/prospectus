@@ -1,3 +1,5 @@
+% !TEX root = 3_16.Rnw
+
 \section{Research Design}
 
 \subsection{Primary Data Source}
@@ -30,17 +32,17 @@ ICEWS covers many countries and periods that do not experience significant level
 
 Given that the theory proposed above expects greater numbers of rebel groups to mobilize against the government as dissident preferences become more diverse, it may be useful as an alternative DV or as an extension to assess the network ties between the groups that participate in violence in a given period. For instance if the broader dissident network shows a low density of ties, indicating diverse interests, the emergence of multiple rebel groups would only be consistent with the theory if said groups were not closely networked. Accounting for the network connections between violent groups, perhaps by dividing the number of groups by the level of connectivity (the proportion of actual ties relative to possible ties) would ``penalize'' the violent group count as the level of connectivity between them increases.
 
-\textbf{Dissident Network Density} \textit{H8a} predicts that the density of the dissident network will tend to reflect that of the external support network. This concept is captured by the edge density of the network, which is the total number of actual ties divided by the total number of possible ties. 
+\textbf{Dissident Network Density} \textit{H8a} predicts that the density of the dissident network will tend to reflect that of the external support network. This concept is captured by the edge density of the network, which is the total number of actual ties divided by the total number of possible ties.
 
-\textbf{Dissident Network Modularity} \textit{H8b} predicts that the modularity of the dissident network will tend to reflect that of the external support network. Measuring this concept first requires the application of a community detection algorithm to the network. I employ the walktrap algorithm, which begins by treating every network node as a separate community, then aggregates them based on a random walk over network ties. Modularity is the sum of the probability of a tie in the network actually falling in a cluster minus the probability of a tie falling into a cluster randomly. The modularity score under this method is the highest modularity value observed between the step in which every node is a community, and the entire network is a single community. 
+\textbf{Dissident Network Modularity} \textit{H8b} predicts that the modularity of the dissident network will tend to reflect that of the external support network. Measuring this concept first requires the application of a community detection algorithm to the network. I employ the walktrap algorithm, which begins by treating every network node as a separate community, then aggregates them based on a random walk over network ties. Modularity is the sum of the probability of a tie in the network actually falling in a cluster minus the probability of a tie falling into a cluster randomly. The modularity score under this method is the highest modularity value observed between the step in which every node is a community, and the entire network is a single community.
 
-\subsection{Explanatory Variables} 
+\subsection{Explanatory Variables}
 
-\textbf{Dissident Network Density} \textit{H1} predicts that the degree of connectivity of the dissident network will shape the structure of violence against the government. 
+\textbf{Dissident Network Density} \textit{H1} predicts that the degree of connectivity of the dissident network will shape the structure of violence against the government.
 
 \textbf{Dissident Network Modularity} \textit{H2} predicts that modular networks, with two or more distinct ``communities'' of dissidents, should be especially likely to be produce multiple rebel groups.
 
-\textbf{Calls for Conflict Resolution} \textit{H3} argues that the logic of a dissident group engaging in violence individually is driven in part by the value of participation in the peace process. It also suggests that calls for conflict resolution by actors within or outside the conflict may serve as a leading indicator that the peace process is likely to begin, providing an impetus for groups to mobilize. ICEWS captures many events in which an actor calls for a conflict to be resolved. The CAMEO coding scheme has separate codes for instances in which an actor calls on others to settle a dispute, to negotiate, and to accept mediation. Roughly 9,000 events of this type appear in the data. 
+\textbf{Calls for Conflict Resolution} \textit{H3} argues that the logic of a dissident group engaging in violence individually is driven in part by the value of participation in the peace process. It also suggests that calls for conflict resolution by actors within or outside the conflict may serve as a leading indicator that the peace process is likely to begin, providing an impetus for groups to mobilize. ICEWS captures many events in which an actor calls for a conflict to be resolved. The CAMEO coding scheme has separate codes for instances in which an actor calls on others to settle a dispute, to negotiate, and to accept mediation. Roughly 9,000 events of this type appear in the data.
 
 \textbf{External Network Density} \textit{H8a} predicts that through processes of spillover, the density of the external actor network should influence the density of the dissident network, with the latter increasing its resemblance to the former. I calculate a measure of the edge density for the external network in an equivalent manner as for the dissident network.
 
