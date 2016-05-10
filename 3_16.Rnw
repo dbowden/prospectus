@@ -1,5 +1,3 @@
-% !TEX root = 3_16.Rnw
-
 \documentclass[12pt]{article}
 
 \usepackage[T1]{fontenc}
