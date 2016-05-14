@@ -22,7 +22,7 @@
 
 \begin{document}
 
-\author{David Bowden}
+\author{David F. Bowden}
 \title{Politics Among Rebels: The Causes and Consequences of Division within Dissident Movements}
 \begin{singlespace}
 \maketitle
